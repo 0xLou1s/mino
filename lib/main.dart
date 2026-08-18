@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:mino/screens/temp_show_component.dart';
+import 'package:mino/screens/home_screen.dart';
 
 import 'theme/theme.dart';
 
@@ -21,6 +21,6 @@ class Application extends StatelessWidget {
       data: Theme.brightnessOf(context) == .light ? lightTheme : darkTheme,
       child: FToaster(child: FTooltipGroup(child: child!)),
     ),
-    home: const TempShowComponent(),
+    home: const HomeScreen(),
   );
 }
