@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import 'package:forui/forui.dart';
@@ -102,12 +104,34 @@ FCalendarStyle calendarStyle({
 
 /// Current-month days sit on a muted tile, adjacent-month days stay bare, and
 /// the selected day fills with the foreground colour.
+///
+/// Forui's inherited styles carry a separate entry per interaction combination
+/// (`today & pressed`, `adjacent & focused`, ...), and `resolve` prefers the
+/// most specific match. Overriding only the plain constraints would leave those
+/// compounds showing the inherited look on tap or focus, so each rule is
+/// applied with `match`, which sweeps every entry containing the variant.
+/// The interaction variants Forui pairs with each day state. They are included
+/// when matching so a rule also covers its `& hovered`, `& pressed` and
+/// `& focused` entries, which `match` skips unless the variant is present.
+final _interactions = <FCalendarDayVariant>{
+  FCalendarDayVariant.hovered,
+  FCalendarDayVariant.pressed,
+  FCalendarDayVariant.focused,
+};
+
 FCalendarDayStyles _dayStyles({
   required FColors colors,
   required FTypography typography,
   required FStyle style,
 }) {
   final tile = RoundedSuperellipseBorder(borderRadius: style.borderRadius.md);
+  final muted = FCalendarDayStyleDelta.delta(
+    foreground: .shapeDelta(color: colors.muted, shape: tile),
+  );
+  final filled = FCalendarDayStyleDelta.delta(
+    textStyle: .delta(color: colors.background),
+    foreground: .shapeDelta(color: colors.foreground, shape: tile),
+  );
 
   return FCalendarDayStyles(
     FCalendarDayStyles.inherit(
@@ -115,25 +139,26 @@ FCalendarDayStyles _dayStyles({
       typography: typography,
       style: style,
     ).apply([
-      .base(.delta(foreground: .shapeDelta(color: colors.muted, shape: tile))),
-      // The inherited `today` variant carries its own foreground, so the
-      // fill has to be set explicitly rather than inherited from the base.
-      .exact({.today}, .delta(
-        textStyle: .delta(decoration: () => TextDecoration.none),
-        foreground: .shapeDelta(color: colors.muted, shape: tile),
-      )),
-      .exact({.adjacent}, .delta(
+      // The circled number replaces Forui's underline as today's marker.
+      .variants(.delta(textStyle: .delta(decoration: () => TextDecoration.none))),
+      .base(muted),
+      .variants(muted),
+      .match({.adjacent, ..._interactions}, .delta(
         textStyle: .delta(color: colors.mutedForeground),
         foreground: .shapeDelta(color: Colors.transparent, shape: tile),
       )),
-      .exact({.single}, .delta(
-        textStyle: .delta(color: colors.background),
-        foreground: .shapeDelta(color: colors.foreground, shape: tile),
+      .match({.disabled, ..._interactions}, .delta(
+        textStyle: .delta(color: colors.disable(colors.mutedForeground)),
+        foreground: .shapeDelta(color: colors.muted, shape: tile),
       )),
-      .exact({.single.and(.today)}, .delta(
-        textStyle: .delta(color: colors.background),
-        foreground: .shapeDelta(color: colors.foreground, shape: tile),
-      )),
+      // `match` cannot target `single` alone -- widening the set to reach its
+      // compounds would also sweep the bare interaction entries -- so the
+      // selected combinations are set explicitly.
+      .exact({
+        .single,
+        .single.and(.today),
+        for (final i in _interactions) ...[.single.and(i), .single.and(.today).and(i)],
+      }, filled),
     ]),
   );
 }
@@ -147,6 +172,7 @@ FCalendarDayBuilder dayBuilder({
   required FColors colors,
   required FStyle style,
   required Set<DateTime> eventDates,
+  required Size daySize,
   double gap = 6,
 }) => (context, styles, localizations, date, variants) {
   final day = styles.resolve(variants);
@@ -163,11 +189,16 @@ FCalendarDayBuilder dayBuilder({
       ? DecoratedBox(
           decoration: BoxDecoration(color: colors.foreground, shape: .circle),
           child: SizedBox.square(
-            dimension: 28,
-            child: Center(
-              child: Text(
-                DateFormat.d(localizations.localeName).format(date),
-                style: day.textStyle.copyWith(color: colors.background),
+            // Sized off the cell so the circle keeps its proportions on any
+            // layout, with room for the tile inset and a scaled-up label.
+            dimension: math.min(daySize.height, daySize.width - gap) * 0.7,
+            child: FittedBox(
+              child: Padding(
+                padding: const EdgeInsets.all(2),
+                child: Text(
+                  DateFormat.d(localizations.localeName).format(date),
+                  style: day.textStyle.copyWith(color: colors.background),
+                ),
               ),
             ),
           ),
