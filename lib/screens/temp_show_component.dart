@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:mino/screens/home_screen.dart';
 
 class TempShowComponent extends StatelessWidget {
   const TempShowComponent({super.key});
@@ -18,6 +19,13 @@ class TempShowComponent extends StatelessWidget {
               mainAxisSize: .min,
               onPress: _noop,
               child: const Text('Button'),
+            ),
+            FButton(
+              mainAxisSize: .min,
+              onPress: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const HomeScreen()),
+              ),
+              child: const Text('Open Home'),
             ),
           ],
         ),
