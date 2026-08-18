@@ -1,0 +1,62 @@
+import 'package:forui/forui.dart';
+import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
+
+import 'styles/button_styles.dart';
+
+part 'colors.dart';
+part 'typography.dart';
+part 'style.dart';
+part 'icons.dart';
+
+FThemeData get lightTheme {
+  const touch = true;
+
+  final colors = lightColors;
+
+  final typography = _typography(colors: colors, touch: touch);
+
+  final icons = _icons();
+
+  final style = _style(colors: colors, typography: typography, touch: touch);
+
+  return FThemeData(
+    colors: colors,
+    typography: typography,
+    icons: icons,
+    style: style,
+    touch: touch,
+    buttonStyles: buttonStyles(
+      colors: colors,
+      typography: typography,
+      style: style,
+      touch: touch,
+    ),
+  );
+}
+
+FThemeData get darkTheme {
+  const touch = true;
+
+  final colors = darkColors;
+
+  final typography = _typography(colors: colors, touch: touch);
+
+  final icons = _icons();
+
+  final style = _style(colors: colors, typography: typography, touch: touch);
+
+  return FThemeData(
+    colors: colors,
+    typography: typography,
+    icons: icons,
+    style: style,
+    touch: touch,
+    buttonStyles: buttonStyles(
+      colors: colors,
+      typography: typography,
+      style: style,
+      touch: touch,
+    ),
+  );
+}
