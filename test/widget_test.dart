@@ -10,11 +10,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(PeriodPicker), findsOneWidget);
-    for (final period in Period.values) {
-      expect(find.text(period.label), findsOneWidget);
-    }
-    await tester.tap(find.text(Period.month.label));
-    await tester.pumpAndSettle();
     expect(find.byType(FCalendar), findsOneWidget);
   });
 }

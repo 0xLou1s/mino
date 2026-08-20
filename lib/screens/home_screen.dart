@@ -9,10 +9,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const AppScaffold(
-      title: 'Mino',
-      onAddEvent: _noop,
-      child: PeriodPicker(),
-    );
+    return const AppScaffold(onAddEvent: _noop, child: PeriodPicker());
   }
 }

@@ -190,15 +190,14 @@ FCalendarDayBuilder dayBuilder({
           decoration: BoxDecoration(color: colors.foreground, shape: .circle),
           child: SizedBox.square(
             // Sized off the cell so the circle keeps its proportions on any
-            // layout, with room for the tile inset and a scaled-up label.
+            // layout, with room for the tile inset.
             dimension: math.min(daySize.height, daySize.width - gap) * 0.7,
-            child: FittedBox(
-              child: Padding(
-                padding: const EdgeInsets.all(2),
-                child: Text(
-                  DateFormat.d(localizations.localeName).format(date),
-                  style: day.textStyle.copyWith(color: colors.background),
-                ),
+            // The label keeps the shared text style so the number does not
+            // change size when the circle appears or is replaced by selection.
+            child: Center(
+              child: Text(
+                DateFormat.d(localizations.localeName).format(date),
+                style: day.textStyle.copyWith(color: colors.background),
               ),
             ),
           ),

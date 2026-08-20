@@ -2,25 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 
 class AppScaffold extends StatelessWidget {
-  final String title;
   final Widget child;
   final VoidCallback? onAddEvent;
 
-  const AppScaffold({
-    super.key,
-    required this.title,
-    required this.child,
-    this.onAddEvent,
-  });
+  const AppScaffold({super.key, required this.child, this.onAddEvent});
 
   @override
   Widget build(BuildContext context) {
     return FScaffold(
-      header: FHeader(title: Text(title)),
+      // Without a header there is nothing holding content clear of the status
+      // bar and dynamic island.
       child: Stack(
         fit: StackFit.expand,
         children: [
-          child,
+          SafeArea(bottom: false, child: child),
 
           if (onAddEvent != null) _BottomActionLayer(onAddEvent: onAddEvent!),
         ],

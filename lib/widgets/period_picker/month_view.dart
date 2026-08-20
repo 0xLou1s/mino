@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:mino/theme/styles/calendar_style.dart';
+import 'package:mino/widgets/period_picker/month_header.dart';
 
 /// A month grid of days, filling the available width.
 class MonthView extends StatefulWidget {
@@ -57,7 +58,8 @@ class _MonthViewState extends State<MonthView> {
             selectionControl: FDateSelectionControl.managedSingle(
               onChange: widget.onSelect,
             ),
-            headerBuilder: (_, _, _, _) => const SizedBox.shrink(),
+            headerBuilder: (_, controller, _, _) =>
+                MonthHeader(controller: controller),
             dayBuilder: dayBuilder(
               colors: theme.colors,
               style: theme.style,
